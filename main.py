@@ -152,12 +152,15 @@ cs_model = cs.Function('y', [x_sym], [f_sym])
 x = np.random.random(in_size)
 x_torch = torch.tensor(x, dtype=torch.float32)
 x_cs = cs.DM(x)
-random_w = cs.DM(np.random.random(pyTorch_model.weights_shape))
-x_with_w = cs.vcat([x_cs, random_w])
+x_with_w = pyTorch_model._sym_concat_with_weights(x_cs)
+
+# random_w = cs.DM(np.random.random(pyTorch_model.weights_shape))
+# x_with_w = cs.vcat([x_cs, random_w])
+
 pyTorch_model.to_torch()
 print("torch ", pyTorch_model(x_torch).detach().numpy())
-print("casadi ", cs_model(x_cs))
-print("casadi with random weghts ", cs_model_with_w(x_with_w))
+print("casadi with constant weights", cs_model(x_cs))
+print("casadi with varible weghts ", cs.evalf(cs_model_with_w(x_with_w)))
 
 # %%
 # speed test
